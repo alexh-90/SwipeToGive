@@ -1,0 +1,25 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <ImageView
+        android:id="@+id/imgView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
+    </ImageView>
+
+    <Button android:id="@+id/buttonLoadPicture"
+        android:layout_width="@dimen/dialog_fixed_width_major"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:text="@string/choose_file"
+        android:layout_margin="30dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:layout_gravity="center">
+    </Button>
+
+</LinearLayout>
