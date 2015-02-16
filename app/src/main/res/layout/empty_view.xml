@@ -4,15 +4,11 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <GridView
-        android:id="@+id/gridview"
+    <TextView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:columnWidth="90dp"
-        android:numColumns="3"
-        android:verticalSpacing="10dp"
-        android:horizontalSpacing="10dp"
-        android:stretchMode="columnWidth"
-        android:gravity="center"/>
+        android:text="@string/empty_view"
+        android:textSize="20dp"
+        android:gravity="center_vertical|center_horizontal" />/>
 
 </LinearLayout>

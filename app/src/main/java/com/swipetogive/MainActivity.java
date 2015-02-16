@@ -1,10 +1,10 @@
 package com.swipetogive;
 
+import android.content.ClipData;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -13,13 +13,18 @@ import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+
 import android.view.View;
-import android.widget.Button;
+import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -28,50 +33,107 @@ public class MainActivity extends ActionBarActivity {
     private static final int SWIPE_MIN_DISTANCE = 450;
     float y1,y2;
 
+    ImageAdapter myImageAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        Button buttonLoadImage = (Button) findViewById(R.id.buttonLoadPicture);
-        buttonLoadImage.setOnClickListener(new View.OnClickListener() {
-
-            public void onClick(View view) {
-
-                Intent intent = new Intent();
-                intent.setType("*/*");
-                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), RESULT_LOAD_IMAGE);
-            }
-        });
+        setContentView(R.layout.empty_view);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i("RESULT data.getData", "" + data.getData());
         super.onActivityResult(requestCode, resultCode, data);
 
-        Log.d("RESULT RequestCode", "" + requestCode);
-        Log.d("RESULT ResultCode", "" + resultCode);
-        Log.d("RESULT data", "" + data);
-        Log.d("RESULT data.getData", "" + data.getData());
+        Log.i("RESULT RequestCode", "" + requestCode);
+        Log.i("RESULT ResultCode", "" + resultCode);
+        Log.i("RESULT data", "" + data);
+        ArrayList<String> images = new ArrayList<String>();
 
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == -1) {
-            Uri selectedImage = data.getData();
-            String path = getPath(this,selectedImage);
-            Log.d("Path", path);
 
-            ImageView imageView = (ImageView) findViewById(R.id.imgView);
-            imageView.setImageBitmap(BitmapFactory.decodeFile(path));
+            if(data.getData()!=null) {
+                Uri imgUri = data.getData();
+                String path = getPath(this,imgUri);
+                Log.i("1: ", "" + data.getData());
+                images.add(path);
+            } else if(data.getClipData()!=null){
+                ClipData mClipData=data.getClipData();
+
+                for(int i=0;i<mClipData.getItemCount();i++){
+                    ClipData.Item item = mClipData.getItemAt(i);
+                    Uri uri = item.getUri();
+                    Log.i("URI: ", "" + uri);
+                    String tempPath = getPath(this,uri);
+                    images.add(tempPath);
+                }
+                Log.v("LOG_TAG", "Selected Images: "+ mClipData.getItemCount());
+            } else {
+                Log.e("ERR", "No data received!");
+            }
+
+            /*
+            String fileType = getType(uri);
+            Log.d("Type", fileType);
+
+            if(fileType.equals("image")) {
+                //ImageView imageView = (ImageView) findViewById(R.id.imgView);
+                //imageView.setImageBitmap(BitmapFactory.decodeFile(path));
+            } else if(fileType.equals("video")) {
+                VideoView videoView = (VideoView)findViewById(R.id.VideoView);
+                videoView.setVideoPath(path);
+                videoView.seekTo(1000);
+            }*/
+
+            setContentView(R.layout.activity_main);
+            final GridView gridview = (GridView) findViewById(R.id.gridview);
+            myImageAdapter = new ImageAdapter(this);
+            gridview.setAdapter(myImageAdapter);
+            myImageAdapter.notifyDataSetChanged();
+            gridview.setOnTouchListener(new TextView.OnTouchListener(){
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+
+                    switch (event.getAction()) {
+                        // when user first touches the screen we get y coordinate
+                        case MotionEvent.ACTION_DOWN: {
+                            y1 = event.getY();
+                            break;
+                        }
+                        case MotionEvent.ACTION_UP: {
+                            y2 = event.getY();
+
+                            float length = Math.abs(y2 - y1);
+
+                            if (y1 > y2 && length >= SWIPE_MIN_DISTANCE) {
+                                //if(imageView.getDrawable() != null) {
+                                Log.d("Swipe", "Down to UP Swipe Performed!");
+                                setContentView(R.layout.empty_view);
+                                return true;
+                            }
+                            break;
+                        }
+                    }
+
+                    return true;
+                }
+            });
+
+            // add array of images to ImageAdapter
+            myImageAdapter.add(images);
         }
     }
 
-    public boolean onTouchEvent(MotionEvent event) {
-        Log.d("EVENT", "onTouchEvent");
-        ImageView imageView = (ImageView) findViewById(R.id.imgView);
+    private void setEmpty(GridView view) {
+        Log.d("setEmpty ", "in Method!");
+        ArrayList<String> emptyList = new ArrayList<String>();
+        myImageAdapter.add(emptyList);
+    }
 
-        switch (event.getAction()) {
+    public boolean onTouchEvent(MotionEvent event) {
+
+        /*switch (event.getAction()) {
             // when user first touches the screen we get y coordinate
             case MotionEvent.ACTION_DOWN: {
                 y1 = event.getY();
@@ -83,19 +145,33 @@ public class MainActivity extends ActionBarActivity {
                 float length = Math.abs(y2 - y1);
 
                 if (y1 > y2 && length >= SWIPE_MIN_DISTANCE) {
-                    if(imageView.getDrawable() != null) {
+                    //if(imageView.getDrawable() != null) {
                         Toast.makeText(this, "Down to UP Swipe Performed!", Toast.LENGTH_SHORT).show();
-                        imageView.setImageDrawable(null);
+                        gridview.setEmptyView(findViewById(R.id.gridview));
                         return true;
-                    } else {
-                        Toast.makeText(this, "Please select a file!", Toast.LENGTH_SHORT).show();
-                        return false;
-                    }
+//                    } else {
+//                        Toast.makeText(this, "Please select a file!", Toast.LENGTH_SHORT).show();
+//                        return false;
+//                    }
                 }
                 break;
             }
-        }
+        }*/
         return false;
+    }
+
+    /**
+     * Get the type of a file
+     *
+     * @param uri The Uri to query.
+     * @return The type of the uri as String. E.g: video or image
+     */
+    public static String getType(Uri uri) {
+        final String docId = DocumentsContract.getDocumentId(uri);
+        final String[] split = docId.split(":");
+        final String type = split[0];
+
+        return type;
     }
 
     public static String getPath(final Context context, final Uri uri) {
@@ -229,10 +305,19 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.buttonLoadPicture) {
+            Intent intent = new Intent();
+            intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
+            intent.setType("image/*");
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+
+            startActivityForResult(Intent.createChooser(intent, "Select Picture"), RESULT_LOAD_IMAGE);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
 }
+
