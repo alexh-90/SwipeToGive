@@ -13,24 +13,24 @@ import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 
 import android.view.View;
+
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 
+import com.swipetogive.com.swipetogive.wifi.PeerListActivity;
 
 public class MainActivity extends ActionBarActivity {
 
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final int SWIPE_MIN_DISTANCE = 450;
+
     float y1,y2;
 
     ImageAdapter myImageAdapter;
@@ -46,9 +46,6 @@ public class MainActivity extends ActionBarActivity {
         Log.i("RESULT data.getData", "" + data.getData());
         super.onActivityResult(requestCode, resultCode, data);
 
-        Log.i("RESULT RequestCode", "" + requestCode);
-        Log.i("RESULT ResultCode", "" + resultCode);
-        Log.i("RESULT data", "" + data);
         ArrayList<String> images = new ArrayList<String>();
 
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == -1) {
@@ -56,7 +53,6 @@ public class MainActivity extends ActionBarActivity {
             if(data.getData()!=null) {
                 Uri imgUri = data.getData();
                 String path = getPath(this,imgUri);
-                Log.i("1: ", "" + data.getData());
                 images.add(path);
             } else if(data.getClipData()!=null){
                 ClipData mClipData=data.getClipData();
@@ -64,10 +60,10 @@ public class MainActivity extends ActionBarActivity {
                 for(int i=0;i<mClipData.getItemCount();i++){
                     ClipData.Item item = mClipData.getItemAt(i);
                     Uri uri = item.getUri();
-                    Log.i("URI: ", "" + uri);
                     String tempPath = getPath(this,uri);
                     images.add(tempPath);
                 }
+
                 Log.v("LOG_TAG", "Selected Images: "+ mClipData.getItemCount());
             } else {
                 Log.e("ERR", "No data received!");
@@ -108,14 +104,13 @@ public class MainActivity extends ActionBarActivity {
 
                             if (y1 > y2 && length >= SWIPE_MIN_DISTANCE) {
                                 //if(imageView.getDrawable() != null) {
-                                Log.d("Swipe", "Down to UP Swipe Performed!");
+                                Toast.makeText(getApplicationContext(),"Down to UP Swipe Performed!",Toast.LENGTH_SHORT).show();
                                 setContentView(R.layout.empty_view);
                                 return true;
                             }
                             break;
                         }
                     }
-
                     return true;
                 }
             });
@@ -123,41 +118,6 @@ public class MainActivity extends ActionBarActivity {
             // add array of images to ImageAdapter
             myImageAdapter.add(images);
         }
-    }
-
-    private void setEmpty(GridView view) {
-        Log.d("setEmpty ", "in Method!");
-        ArrayList<String> emptyList = new ArrayList<String>();
-        myImageAdapter.add(emptyList);
-    }
-
-    public boolean onTouchEvent(MotionEvent event) {
-
-        /*switch (event.getAction()) {
-            // when user first touches the screen we get y coordinate
-            case MotionEvent.ACTION_DOWN: {
-                y1 = event.getY();
-                break;
-            }
-            case MotionEvent.ACTION_UP: {
-                y2 = event.getY();
-
-                float length = Math.abs(y2 - y1);
-
-                if (y1 > y2 && length >= SWIPE_MIN_DISTANCE) {
-                    //if(imageView.getDrawable() != null) {
-                        Toast.makeText(this, "Down to UP Swipe Performed!", Toast.LENGTH_SHORT).show();
-                        gridview.setEmptyView(findViewById(R.id.gridview));
-                        return true;
-//                    } else {
-//                        Toast.makeText(this, "Please select a file!", Toast.LENGTH_SHORT).show();
-//                        return false;
-//                    }
-                }
-                break;
-            }
-        }*/
-        return false;
     }
 
     /**
@@ -314,9 +274,24 @@ public class MainActivity extends ActionBarActivity {
 
             startActivityForResult(Intent.createChooser(intent, "Select Picture"), RESULT_LOAD_IMAGE);
             return true;
+        } else if(id == R.id.showPeers) {
+            Intent intent = new Intent(this, PeerListActivity.class);
+            startActivity(intent);
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /* register the broadcast receiver with the intent values to be matched */
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+    /* unregister the broadcast receiver */
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
 }
