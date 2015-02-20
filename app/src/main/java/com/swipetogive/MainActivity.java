@@ -24,7 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
 
-import com.swipetogive.com.swipetogive.wifi.PeerListActivity;
+import com.swipetogive.wifidirect.WiFiDirectActivity;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -32,7 +32,6 @@ public class MainActivity extends ActionBarActivity {
     private static final int SWIPE_MIN_DISTANCE = 450;
 
     float y1,y2;
-
     ImageAdapter myImageAdapter;
 
     @Override
@@ -275,7 +274,7 @@ public class MainActivity extends ActionBarActivity {
             startActivityForResult(Intent.createChooser(intent, "Select Picture"), RESULT_LOAD_IMAGE);
             return true;
         } else if(id == R.id.showPeers) {
-            Intent intent = new Intent(this, PeerListActivity.class);
+            Intent intent = new Intent(this, WiFiDirectActivity.class);
             startActivity(intent);
             return true;
         }
