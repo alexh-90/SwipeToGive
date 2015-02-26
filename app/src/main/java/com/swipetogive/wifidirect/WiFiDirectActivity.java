@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2011 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.swipetogive.wifidirect;
 
 import android.app.Activity;
@@ -28,6 +12,9 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.ActionListener;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.ChannelListener;
+import android.nfc.NdefMessage;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -38,9 +25,12 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.swipetogive.R;
+import com.swipetogive.util.ApplicationBroadcastReceiver;
 import com.swipetogive.wifidirect.DeviceListFragment.DeviceActionListener;
 
-public class WiFiDirectActivity extends Activity implements ChannelListener, DeviceActionListener {
+
+public class WiFiDirectActivity extends Activity implements ChannelListener, DeviceActionListener, NfcAdapter.CreateNdefMessageCallback,
+        NfcAdapter.OnNdefPushCompleteCallback {
 
     public static final String TAG = "wifidirectdemo";
     private WifiP2pManager manager;
@@ -79,7 +69,6 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
         } else {
             isWifiP2pEnabled = true;
         }
-        Log.d("action main", "" + isWifiP2pEnabled);
 
         final DeviceListFragment fragment = (DeviceListFragment) getFragmentManager()
                 .findFragmentById(R.id.frag_list);
@@ -104,7 +93,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
     @Override
     public void onResume() {
         super.onResume();
-        receiver = new WiFiDirectBroadcastReceiver(manager, channel, this);
+        receiver = new ApplicationBroadcastReceiver(manager, channel, this);
         registerReceiver(receiver, intentFilter);
     }
 
@@ -262,5 +251,15 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
     public boolean getIsWifiP2pEnabled() {
 
         return isWifiP2pEnabled;
+    }
+
+    @Override
+    public NdefMessage createNdefMessage(NfcEvent event) {
+        return null;
+    }
+
+    @Override
+    public void onNdefPushComplete(NfcEvent event) {
+
     }
 }

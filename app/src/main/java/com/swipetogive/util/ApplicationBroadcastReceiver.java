@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.swipetogive.wifidirect;
+package com.swipetogive.util;
 
+import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -27,11 +28,15 @@ import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.util.Log;
 
 import com.swipetogive.R;
+import com.swipetogive.bluetooth.BluetoothActivity;
+import com.swipetogive.wifidirect.DeviceDetailFragment;
+import com.swipetogive.wifidirect.DeviceListFragment;
+import com.swipetogive.wifidirect.WiFiDirectActivity;
 
 /**
  * A BroadcastReceiver that notifies of important wifi p2p events.
  */
-public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
+public class ApplicationBroadcastReceiver extends BroadcastReceiver {
 
     private WifiP2pManager manager;
     private Channel channel;
@@ -42,8 +47,8 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
      * @param channel Wifi p2p channel
      * @param activity activity associated with the receiver
      */
-    public WiFiDirectBroadcastReceiver(WifiP2pManager manager, Channel channel,
-            WiFiDirectActivity activity) {
+    public ApplicationBroadcastReceiver(WifiP2pManager manager, Channel channel,
+                                        WiFiDirectActivity activity) {
         super();
         this.manager = manager;
         this.channel = channel;
@@ -58,7 +63,8 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
+
+         if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
 
             // UI update to indicate wifi p2p status.
             int state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1);

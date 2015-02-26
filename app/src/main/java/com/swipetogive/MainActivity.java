@@ -16,14 +16,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-
 import android.view.View;
-
 import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
 
+import com.swipetogive.bluetooth.BluetoothActivity;
 import com.swipetogive.wifidirect.WiFiDirectActivity;
 
 public class MainActivity extends ActionBarActivity {
@@ -33,6 +32,8 @@ public class MainActivity extends ActionBarActivity {
 
     float y1,y2;
     ImageAdapter myImageAdapter;
+
+    Uri myUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +46,14 @@ public class MainActivity extends ActionBarActivity {
         Log.i("RESULT data.getData", "" + data.getData());
         super.onActivityResult(requestCode, resultCode, data);
 
-        ArrayList<String> images = new ArrayList<String>();
+        ArrayList<String> images = new ArrayList<>();
 
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == -1) {
 
             if(data.getData()!=null) {
                 Uri imgUri = data.getData();
+                Log.d("path", imgUri.getLastPathSegment());
+                myUri = data.getData();
                 String path = getPath(this,imgUri);
                 images.add(path);
             } else if(data.getClipData()!=null){
@@ -119,20 +122,6 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    /**
-     * Get the type of a file
-     *
-     * @param uri The Uri to query.
-     * @return The type of the uri as String. E.g: video or image
-     */
-    public static String getType(Uri uri) {
-        final String docId = DocumentsContract.getDocumentId(uri);
-        final String[] split = docId.split(":");
-        final String type = split[0];
-
-        return type;
-    }
-
     public static String getPath(final Context context, final Uri uri) {
 
         final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
@@ -164,12 +153,18 @@ public class MainActivity extends ActionBarActivity {
                 final String type = split[0];
 
                 Uri contentUri = null;
-                if ("image".equals(type)) {
-                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                } else if ("video".equals(type)) {
-                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-                } else if ("audio".equals(type)) {
-                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+
+                switch(type) {
+                    case "image":
+                        contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                        break;
+                    case "video":
+                        contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                        break;
+                    case "audio":
+                        contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                        break;
+                    default:
                 }
 
                 final String selection = "_id=?";
@@ -274,7 +269,7 @@ public class MainActivity extends ActionBarActivity {
             startActivityForResult(Intent.createChooser(intent, "Select Picture"), RESULT_LOAD_IMAGE);
             return true;
         } else if(id == R.id.showPeers) {
-            Intent intent = new Intent(this, WiFiDirectActivity.class);
+            Intent intent = new Intent(this, BluetoothActivity.class);
             startActivity(intent);
             return true;
         }
