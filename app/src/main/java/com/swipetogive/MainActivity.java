@@ -253,25 +253,25 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.buttonLoadPicture) {
-            Intent intent = new Intent();
-            intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
-            intent.setType("image/*");
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            intent.setAction(Intent.ACTION_GET_CONTENT);
-
-            startActivityForResult(Intent.createChooser(intent, "Select Picture"), RESULT_LOAD_IMAGE);
-            return true;
-        } else if(id == R.id.showPeers) {
-            Intent intent = new Intent(this, BluetoothActivity.class);
-            startActivity(intent);
-            return true;
+        switch(id) {
+            case R.id.buttonLoadPicture:
+                Intent buttonLoadPictureIntent = new Intent();
+                buttonLoadPictureIntent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
+                buttonLoadPictureIntent.setType("image/*");
+                buttonLoadPictureIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                buttonLoadPictureIntent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(buttonLoadPictureIntent, "Select Picture"), RESULT_LOAD_IMAGE);
+                return true;
+            case R.id.showBluetoothPeers:
+                Intent showBluetoothPeersIntent = new Intent(this, BluetoothActivity.class);
+                startActivity(showBluetoothPeersIntent);
+                return true;
+            case R.id.showWiFiPeers:
+                Intent showWiFiPeersIntent = new Intent(this, WiFiDirectActivity.class);
+                startActivity(showWiFiPeersIntent);
+                return true;
         }
 
         return super.onOptionsItemSelected(item);

@@ -23,22 +23,21 @@
         android:name="android.hardware.bluetooth_le"
         android:required="true" />
 
-    <!-- Used for transferring files  after a successful connection -->
-    <service android:name="com.swipetogive.wifidirect.FileTransferService" android:enabled="true" />
-    <service android:name="com.swipetogive.bluetooth.BluetoothLeService" android:enabled="true"/>
-
     <application
         android:allowBackup="true"
         android:hardwareAccelerated="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+
+        <service android:name=".wifidirect.FileTransferService" android:enabled="true" />
+        <service android:name=".bluetooth.BluetoothLeService" android:enabled="true"/>
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -47,21 +46,23 @@
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".bluetooth.BluetoothActivity"
-            android:label="@string/title_activity_bluetooth"
+            android:label="title_activity_bluetooth"
             android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.swipetogive.MainActivity" />
         </activity>
-        <activity
-            android:name=".bluetooth.DeviceControlActivity"
-            android:label="@string/title_activity_device_control" >
+        <activity android:name=".bluetooth.DeviceControlActivity"
+            android:label="LABEL"
+            android:parentActivityName=".bluetooth.BluetoothActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.swipetogive.MainActivity" />
         </activity>
     </application>
 
